@@ -1,0 +1,20 @@
+# ======================
+# Laravel (Backend)
+# ======================
+aprendelaravel/vendor/
+aprendelaravel/.env
+
+# ======================
+# Next.js (Frontend)
+# ======================
+front-next/node_modules/
+front-next/.next/
+front-next/.env.local
+front-next/.env
+
+# ======================
+# Geral
+# ======================
+.env
+.DS_Store
+Thumbs.db
