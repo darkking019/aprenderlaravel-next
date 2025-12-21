@@ -7,6 +7,20 @@ use App\Models\User;
 
 class EventPolicy
 {
+
+
+
+
+        /**
+ * Listagem de eventos
+ */
+public function viewAny(?User $user): bool
+{
+    return true;
+}
+
+
+
     /**
      * Público: qualquer um vê
      * Privado: só o dono

@@ -7,16 +7,13 @@ import Link from "next/link";
 import Input from "@/app/components/ui/input";
 import Button from "@/app/components/ui/Button";
 
-/**
- * Lê cookie pelo nome
- */
 function getCookie(name: string): string | undefined {
   const value = `; ${document.cookie}`;
   const parts = value.split(`; ${name}=`);
   if (parts.length === 2) return parts.pop()?.split(";").shift();
 }
 
-export default function LoginPage() {
+export default function RegisterPage() {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -27,7 +24,6 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      // 1️⃣ Pega cookie CSRF do Laravel Sanctum
       const csrfRes = await fetch("http://localhost:8000/sanctum/csrf-cookie", {
         credentials: "include",
       });
@@ -37,20 +33,26 @@ export default function LoginPage() {
       const xsrfToken = getCookie("XSRF-TOKEN");
       if (!xsrfToken) throw new Error("Token XSRF não encontrado");
 
-      // 2️⃣ Captura dados do formulário
       const form = e.target as HTMLFormElement;
       const formData = new FormData(form);
+      const name = String(formData.get("name") || "").trim();
       const email = String(formData.get("email") || "").trim();
       const password = String(formData.get("password") || "");
+      const password_confirmation = String(formData.get("password_confirmation") || "");
 
-      if (!email || !password) {
-        setError("Preencha email e senha");
+      if (!name || !email || !password || !password_confirmation) {
+        setError("Preencha todos os campos");
         setLoading(false);
         return;
       }
 
-      // 3️⃣ Requisição de login
-      const loginRes = await fetch("http://localhost:8000/login", {
+      if (password !== password_confirmation) {
+        setError("As senhas não coincidem");
+        setLoading(false);
+        return;
+      }
+
+      const registerRes = await fetch("http://localhost:8000/register", {
         method: "POST",
         credentials: "include",
         headers: {
@@ -58,43 +60,35 @@ export default function LoginPage() {
           Accept: "application/json",
           "X-XSRF-TOKEN": decodeURIComponent(xsrfToken),
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ name, email, password, password_confirmation }),
       });
 
-      if (!loginRes.ok) {
-        const data = await loginRes.json().catch(() => ({}));
+      if (!registerRes.ok) {
+        const data = await registerRes.json().catch(() => ({}));
         setError(
           data.errors?.email?.[0] ||
+            data.errors?.password?.[0] ||
             data.message ||
-            "Email ou senha inválidos"
+            "Erro ao registrar"
         );
         setLoading(false);
         return;
       }
 
-      // 4️⃣ Login OK
-      const loginData = await loginRes.json();
-      console.log("Login sucesso:", loginData);
+      console.log("Registro sucesso");
 
-      // 5️⃣ Confirma usuário autenticado
       const meRes = await fetch("http://localhost:8000/api/user", {
         credentials: "include",
         headers: { Accept: "application/json" },
       });
 
-      let userData: any = null;
       if (meRes.ok) {
-        const meJson = await meRes.json();
-        // Certifique-se de acessar o campo correto
-        userData = meJson.data || meJson;
-        console.log("Usuário autenticado:", userData);
+        console.log("Usuário autenticado");
       }
 
-      // 6️⃣ Redireciona para dashboard
       router.push("/dashboard");
     } catch (err) {
-      console.error("Erro no login:", err);
-      setError("Erro de conexão com o servidor. Verifique se o backend está rodando.");
+      setError("Erro de conexão com o servidor.");
     } finally {
       setLoading(false);
     }
@@ -104,36 +98,18 @@ export default function LoginPage() {
     <main className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <section className="w-full max-w-md space-y-8">
         <div className="text-center">
-          <h1 className="text-3xl font-bold text-gray-900">Entrar na conta</h1>
+          <h1 className="text-3xl font-bold text-gray-900">Criar conta</h1>
           <p className="mt-2 text-sm text-gray-600">
-            Ou{" "}
-            <Link
-              href="/register"
-              className="font-medium text-blue-600 hover:text-blue-500"
-            >
-              crie uma conta nova
-            </Link>
+            Ou <Link href="/login" className="font-medium text-blue-600 hover:text-blue-500">entre na sua conta</Link>
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="mt-8 space-y-6">
           <div className="space-y-4">
-            <Input
-              name="email"
-              type="email"
-              placeholder="seu@email.com"
-              required
-              autoComplete="email"
-              className="w-full"
-            />
-            <Input
-              name="password"
-              type="password"
-              placeholder="••••••••"
-              required
-              autoComplete="current-password"
-              className="w-full"
-            />
+            <Input name="name" type="text" placeholder="Seu nome" required autoComplete="name" className="w-full" />
+            <Input name="email" type="email" placeholder="seu@email.com" required autoComplete="email" className="w-full" />
+            <Input name="password" type="password" placeholder="••••••••" required autoComplete="new-password" className="w-full" />
+            <Input name="password_confirmation" type="password" placeholder="Confirme a senha" required autoComplete="new-password" className="w-full" />
           </div>
 
           {error && (
@@ -142,16 +118,11 @@ export default function LoginPage() {
             </div>
           )}
 
-          <Button
-            type="submit"
-            disabled={loading}
-            className="w-full flex justify-center py-2 px-4"
-          >
-            {loading ? "Entrando..." : "Entrar"}
+          <Button type="submit" disabled={loading} className="w-full flex justify-center py-2 px-4">
+            {loading ? "Criando conta..." : "Criar conta"}
           </Button>
         </form>
       </section>
     </main>
   );
 }
- 

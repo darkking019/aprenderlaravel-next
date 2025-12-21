@@ -5,14 +5,15 @@ import { useRouter } from "next/navigation";
 
 export default function DashboardPage() {
   const router = useRouter();
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<any | null>(null);
   const [events, setEvents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function load() {
       try {
-        const userRes = await fetch("http://localhost:8000/api/user", {
+        // 👤 usuário autenticado
+        const userRes = await fetch("/api/user", {
           credentials: "include",
           headers: { Accept: "application/json" },
         });
@@ -22,14 +23,16 @@ export default function DashboardPage() {
         const userData = await userRes.json();
         setUser(userData);
 
-        const eventsRes = await fetch("http://localhost:8000/api/my-events", {
+        // 📅 eventos do dashboard
+        const eventsRes = await fetch("/api/events", {
           credentials: "include",
           headers: { Accept: "application/json" },
         });
 
-        if (eventsRes.ok) {
-          setEvents(await eventsRes.json());
-        }
+        if (!eventsRes.ok) throw new Error("Erro ao carregar eventos");
+
+        const eventsJson = await eventsRes.json();
+        setEvents(eventsJson.data ?? []); // 👈 importante
       } catch {
         router.push("/login");
       } finally {
@@ -41,11 +44,11 @@ export default function DashboardPage() {
   }, [router]);
 
   async function logout() {
-    await fetch("http://localhost:8000/sanctum/csrf-cookie", {
+    await fetch("/sanctum/csrf-cookie", {
       credentials: "include",
     });
 
-    await fetch("http://localhost:8000/api/logout", {
+    await fetch("/api/logout", {
       method: "POST",
       credentials: "include",
     });
@@ -53,7 +56,13 @@ export default function DashboardPage() {
     router.push("/login");
   }
 
-  if (loading) return <p>Carregando...</p>;
+  if (loading) {
+    return <p className="text-center mt-10">Carregando...</p>;
+  }
+
+  if (!user) {
+    return <p className="text-center mt-10">Usuário não autenticado</p>;
+  }
 
   return (
     <div className="max-w-6xl mx-auto p-6">
@@ -74,7 +83,11 @@ export default function DashboardPage() {
       {events.length ? (
         <div className="grid gap-6 md:grid-cols-3">
           {events.map((event) => (
-            <div key={event.id} className="border p-4 rounded">
+            <div
+              key={event.id}
+              className="border p-4 rounded cursor-pointer hover:bg-gray-50"
+              onClick={() => router.push(`/events/${event.id}`)}
+            >
               <h3 className="font-bold">{event.title}</h3>
             </div>
           ))}

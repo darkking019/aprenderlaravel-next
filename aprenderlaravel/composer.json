@@ -13,6 +13,7 @@
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.10.1",
         "livewire/livewire": "^3.6.4",
+        "mercadopago/dx-php": "^3.8",
         "spatie/laravel-permission": "^6.24"
     },
     "require-dev": {
@@ -31,13 +32,14 @@
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/"
-
-        }
+        },
+        "exclude-from-classmap": [
+            "vendor/league/flysystem-local/"
+        ]
     },
     "autoload-dev": {
         "psr-4": {
             "Tests\\": "tests/"
-
         }
     },
     "scripts": {

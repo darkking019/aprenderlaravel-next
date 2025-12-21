@@ -27,10 +27,11 @@ class FortifyServiceProvider extends ServiceProvider
         Fortify::ignoreRoutes();
 
         // ✅ DEFINE O RATE LIMITER DO LOGIN (OBRIGATÓRIO)
-        RateLimiter::for('login', function (Request $request) {
-            return Limit::perMinute(5)->by(
-                $request->ip()
-            );
-        });
+       RateLimiter::for('login', function (Request $request) {
+    $email = (string) $request->input('email');
+
+    return Limit::perMinute(5)->by($email.$request->ip());
+});
+
     }
 }

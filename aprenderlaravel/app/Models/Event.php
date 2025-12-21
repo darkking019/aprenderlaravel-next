@@ -3,18 +3,14 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use App\Models\User;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-
 
 class Event extends Model
 {
     use HasFactory;
-
-    // ... seu código do model
-
 
     protected $fillable = [
         'title',
@@ -28,13 +24,13 @@ class Event extends Model
     ];
 
     protected $casts = [
-        'items' => 'array',
+        'items'   => 'array',
         'private' => 'boolean',
-        'date' => 'date', // mude para 'datetime' se o campo tiver hora
+        'date'    => 'date', // troque pra datetime se houver hora
     ];
 
     /**
-     * O usuário dono do evento
+     * Dono do evento
      */
     public function user(): BelongsTo
     {
@@ -42,44 +38,35 @@ class Event extends Model
     }
 
     /**
-     * Usuários participantes do evento (muitos-para-muitos)
+     * Participantes do evento
      */
     public function participants(): BelongsToMany
-{
-    return $this->belongsToMany(User::class, 'event_user')
-        ->withTimestamps()
-        ->orderBy('name');
-}
+    {
+        return $this->belongsToMany(User::class, 'event_user')
+            ->withTimestamps();
+    }
 
     /**
-     * Verifica se um usuário específico está participando do evento
+     * Verifica se um usuário participa do evento
      */
-   public function hasParticipant(int $userId): bool
-{
-    return $this->participants()
-        ->whereKey($userId)
-        ->exists();
+    public function hasUser(User $user): bool
+    {
+        return $this->participants()
+            ->where('user_id', $user->id)
+            ->exists();
+    }
+
+    /**
+     * Scope de busca
+     */
+    public function scopeSearch($query, string $search)
+    {
+        return $query->where(function ($q) use ($search) {
+            $q->where('title', 'like', "%{$search}%")
+              ->orWhere('city', 'like', "%{$search}%");
+        });
+    }
 }
-
-   public function hasUser(User $user): bool
-{
-    return $this->participants()
-        ->where('user_id', $user->id)
-        ->exists();
-}
-
-public function scopeSearch($query, string $search)
-{
-    return $query->where(function ($q) use ($search) {
-        $q->where('title', 'like', "%{$search}%")
-          ->orWhere('city', 'like', "%{$search}%");
-    });
-}
-    
-
-}
-
-
 
 
 
