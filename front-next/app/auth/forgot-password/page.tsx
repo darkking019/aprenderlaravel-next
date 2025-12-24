@@ -1,5 +1,5 @@
-import Input from '@/app/components/ui/input';
-import Button from '@/app/components/ui/Button';
+import Input from 'app/components/ui/input';
+import Button from 'app/components/ui/Button';
 import Link from 'next/link';
 
 export default function ForgotPasswordPage() {

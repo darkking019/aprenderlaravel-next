@@ -1,9 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import Input from '@/app/components/ui/input';
-import Button from '@/app/components/ui/Button';
-
+import Input from 'app/components/ui/input';
+import Button from 'app/components/ui/Button';
 export default function TwoFactorChallengePage() {
   const [isRecovery, setIsRecovery] = useState(false);
 
