@@ -11,7 +11,10 @@ Route::get('/health', function () {
         'env' => app()->environment(),
     ]);
 });
-Route::get('/', fn () => ['Laravel' => app()->version()]);
+Route::get('/', function () {
+    return 'Laravel subiu';
+});
+
 
 
 

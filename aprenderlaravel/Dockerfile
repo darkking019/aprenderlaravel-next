@@ -23,7 +23,6 @@ COPY default.conf /etc/nginx/conf.d/default.conf
 EXPOSE 8080
 
 RUN php artisan config:clear \
- && php artisan config:cache \
  && php artisan route:clear \
  && php artisan view:clear
 
