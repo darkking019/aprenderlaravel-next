@@ -7,7 +7,7 @@ return [
     'allowed_methods' => ['*'],
 
     'allowed_origins' => [
-        'https://events-platform-huqa0t1hl-darkking019s-projects.vercel.app' ,
+        'https://events-platform-topaz.vercel.app',
          'http://localhost:3000'
     ],
 
