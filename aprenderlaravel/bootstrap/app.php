@@ -14,21 +14,20 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
 
-    ->withMiddleware(function (Middleware $middleware) {
+   ->withMiddleware(function (Middleware $middleware) {
 
-        // Sanctum SPA
-        $middleware->statefulApi();
+   
+    $middleware->validateCsrfTokens(except: [
+        'api/*',
+        'login',
+        'logout',
+    ]);
 
-        // CSRF desligado só para API
-        $middleware->validateCsrfTokens([
-            'api/*',
-        ]);
-
-        $middleware->alias([
-            'auth' => \App\Http\Middleware\Authenticate::class,
-            'verified' => \App\Http\Middleware\EnsureEmailIsVerified::class,
-        ]);
-    })
+    $middleware->alias([
+        'auth' => \App\Http\Middleware\Authenticate::class,
+        'verified' => \App\Http\Middleware\EnsureEmailIsVerified::class,
+    ]);
+})
 
     ->withExceptions(function (Exceptions $exceptions) {
 
