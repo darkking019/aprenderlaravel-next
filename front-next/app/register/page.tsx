@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 import Input from "app/components/ui/input";
-import Button from "app/components/ui/Button";
+import Button from "app/components/ui/button";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL!;
 

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Input from "app/components/ui/input";
-import Button from "app/components/ui/Button";
+import Button from "app/components/ui/button";
 import Link from "next/link";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL!;
