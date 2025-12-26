@@ -15,12 +15,16 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+          $middleware->prepend(\App\Http\Middleware\DisableCsrfForApi::class);
+          
         $middleware->alias([
             'verified' => \App\Http\Middleware\EnsureEmailIsVerified::class,
         ]);
+
+        // CORS global
+        $middleware->prepend(\App\Http\Middleware\DynamicCors::class);
     })
     ->withExceptions(function (Exceptions $exceptions) {
-
         $exceptions->render(function (
             AuthenticationException $e,
             $request
@@ -56,3 +60,5 @@ return Application::configure(basePath: dirname(__DIR__))
         });
     })
     ->create();
+
+
