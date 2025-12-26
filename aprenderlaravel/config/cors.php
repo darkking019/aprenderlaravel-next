@@ -1,7 +1,8 @@
 <?php
 
 return [
-    'paths' => ['api/*'],
+    'paths' => ['api/*', 'login', 'logout'],
+
     'allowed_methods' => ['*'],
     'allowed_origins' => ['*'], 
     'allowed_headers' => ['Authorization', 'Content-Type', 'Accept'],
