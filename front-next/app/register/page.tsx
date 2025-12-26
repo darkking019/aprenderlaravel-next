@@ -6,8 +6,7 @@ import Link from "next/link";
 
 import Input from "@/app/components/ui/Input/input";
 import Button from "@/app/components/ui/button/Button";
-import { useAuth } from "@/app/context/AuthContext";
-
+import { useAuth } from "app/context/AuthContext";
 const API_URL = process.env.NEXT_PUBLIC_API_URL!;
 
 export default function RegisterPage() {

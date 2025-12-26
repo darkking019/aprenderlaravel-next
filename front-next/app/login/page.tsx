@@ -7,8 +7,8 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth} from 'app/context/AuthContext'
 
-import Input from "@/app/components/ui/Input/input";       // ajuste o caminho se necessário
-import Button from "@/app/components/ui/button/Button";   // ajuste o caminho se necessário
+import Input from "@/app/components/ui/Input/input";     // ajuste o caminho se necessário
+import Button from "@/app/components/ui/button/Button";  // ajuste o caminho se necessário
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL!;
 
