@@ -11,13 +11,11 @@ class DynamicCors
     {
         $allowedOrigins = [
             'http://localhost:3000',
-            // aqui você pode colocar outros domínios confiáveis
+            'https://events-platform-topaz.vercel.app',
         ];
 
-        // Detecta domínio do front
         $origin = $request->headers->get('origin');
 
-        // Permite qualquer subdomínio do Vercel
         if ($origin && (str_contains($origin, '.vercel.app') || in_array($origin, $allowedOrigins))) {
             $headers = [
                 'Access-Control-Allow-Origin' => $origin,
@@ -43,4 +41,3 @@ class DynamicCors
         return $next($request);
     }
 }
-

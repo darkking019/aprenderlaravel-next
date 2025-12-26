@@ -14,16 +14,20 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
-    ->withMiddleware(function (Middleware $middleware) {
-          $middleware->prepend(\App\Http\Middleware\DisableCsrfForApi::class);
-          
-        $middleware->alias([
-            'verified' => \App\Http\Middleware\EnsureEmailIsVerified::class,
-        ]);
+   ->withMiddleware(function (Middleware $middleware) {
 
-        // CORS global
-        $middleware->prepend(\App\Http\Middleware\DynamicCors::class);
-    })
+    //  CORS global (sempre primeiro)
+    $middleware->prepend(\App\Http\Middleware\DynamicCors::class);
+
+    //  Desabilita CSRF para APIs
+    $middleware->prepend(\App\Http\Middleware\DisableCsrfForApi::class);
+
+    //  Alias padrão
+    $middleware->alias([
+        'verified' => \App\Http\Middleware\EnsureEmailIsVerified::class,
+    ]);
+})
+
     ->withExceptions(function (Exceptions $exceptions) {
         $exceptions->render(function (
             AuthenticationException $e,

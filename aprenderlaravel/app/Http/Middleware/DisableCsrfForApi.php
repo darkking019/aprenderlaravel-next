@@ -3,11 +3,17 @@
 namespace App\Http\Middleware;
 
 use Closure;
-use Illuminate\Foundation\Http\Middleware\ValidateCsrfToken;
+use Illuminate\Http\Request;
 
-class DisableCsrfForApi extends ValidateCsrfToken
+class DisableCsrfForApi
 {
-    protected $except = [
-        'api/*',
-    ];
+    public function handle(Request $request, Closure $next)
+    {
+        // Desativa CSRF apenas para rotas que começam com /api
+        if ($request->is('api/*')) {
+            $request->session()->forget('_token'); // ou simplesmente ignora
+        }
+
+        return $next($request);
+    }
 }
