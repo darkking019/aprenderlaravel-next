@@ -187,58 +187,60 @@ export default function CreateEventPage() {
   // Submit
   // ---------------------------
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!validateForm()) return;
+  e.preventDefault();
+  if (!validateForm()) return;
 
-    setSubmitting(true);
+  setSubmitting(true);
 
-    try {
-      const payload = new FormData();
-      payload.append("title", formData.title);
-      payload.append("description", formData.description);
-      payload.append("date", formData.date);
-      payload.append("city", formData.city);
-      payload.append("private", formData.is_public ? "0" : "1");
-      payload.append("items", JSON.stringify(formData.items));
-
-      if (formData.image) {
-        payload.append("image", formData.image);
-      }
-
-      console.log("API URL:", `${API_URL}/api/events/create-payment`);
-
-      const res = await fetch(
-        `${API_URL}/api/events/create-payment`,
-        {
-          method: "POST",
-          credentials: "include",
-          headers: { Accept: "application/json" },
-          body: payload,
-        }
-      );
-
-      if (!res.ok) {
-        const text = await res.text();
-        console.error("Erro backend:", text);
-        alert("Erro ao criar pagamento.");
-        return;
-      }
-
-      const data = await res.json();
-      setPrice(data.price);
-
-      window.location.href = data.init_point;
-    } catch (err) {
-      console.error("FETCH ERROR:", err);
-      alert("Erro de conexão.");
-    } finally {
-      setSubmitting(false);
+  try {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      alert("Usuário não autenticado");
+      router.push("/login");
+      return;
     }
-  };
 
-  if (loading) {
-    return <p className="text-center p-6">Carregando...</p>;
+    const payload = new FormData();
+    payload.append("title", formData.title);
+    payload.append("description", formData.description);
+    payload.append("date", formData.date);
+    payload.append("city", formData.city);
+    payload.append("private", formData.is_public ? "0" : "1");
+    payload.append("items", JSON.stringify(formData.items));
+
+    if (formData.image) {
+      payload.append("image", formData.image);
+    }
+
+    console.log("API URL:", `${API_URL}/api/events/create-payment`);
+
+    const res = await fetch(`${API_URL}/api/events/create-payment`, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        Authorization: `Bearer ${token}`, // Bearer token
+      },
+      body: payload,
+    });
+
+    if (!res.ok) {
+      const text = await res.text();
+      console.error("Erro backend:", text);
+      alert("Erro ao criar pagamento.");
+      return;
+    }
+
+    const data = await res.json();
+    setPrice(data.price);
+
+    window.location.href = data.init_point;
+  } catch (err) {
+    console.error("FETCH ERROR:", err);
+    alert("Erro de conexão.");
+  } finally {
+    setSubmitting(false);
   }
+};
 
   // ---------------------------
   // JSX
