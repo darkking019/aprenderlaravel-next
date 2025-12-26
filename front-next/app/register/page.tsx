@@ -1,12 +1,14 @@
 "use client";
+
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 import Input from "@/app/components/ui/Input/input";
 import Button from "@/app/components/ui/button/Button";
-import { apiFetch } from "@/lib/api";
-import { useAuth } from "app/context/AuthContext";
+import { useAuth } from "@/app/context/AuthContext";
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL!;
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -38,9 +40,13 @@ export default function RegisterPage() {
         throw new Error("As senhas não coincidem");
       }
 
-      const res = await apiFetch("/register", {
+      // ✅ REGISTER (Bearer Token)
+      const res = await fetch(`${API_URL}/register`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
         body: JSON.stringify({
           name,
           email,
@@ -49,9 +55,8 @@ export default function RegisterPage() {
         }),
       });
 
-      const data = await res.json();
-
       if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
         throw new Error(
           data.message ||
             data.errors?.email?.[0] ||
@@ -60,9 +65,13 @@ export default function RegisterPage() {
         );
       }
 
-      // 🔐 login via Bearer Token
-      login(data.token, data.user);
+      // ✅ Espera token + user
+      const { token, user } = await res.json();
 
+      // ✅ Salva no contexto + localStorage
+      login(token, user);
+
+      // ✅ Redirect
       router.push("/dashboard");
     } catch (err: any) {
       console.error(err);
@@ -73,33 +82,75 @@ export default function RegisterPage() {
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-gray-50">
+    <main className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <section className="w-full max-w-md space-y-8">
-        <h1 className="text-3xl font-bold text-center">Criar conta</h1>
+        <div className="text-center">
+          <h1 className="text-3xl font-bold text-gray-900">Criar conta</h1>
+          <p className="mt-2 text-sm text-gray-600">
+            Ou{" "}
+            <Link
+              href="/login"
+              className="font-medium text-blue-600 hover:text-blue-500"
+            >
+              entre na sua conta
+            </Link>
+          </p>
+        </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <Input name="name" placeholder="Nome" required />
-          <Input name="email" type="email" placeholder="Email" required />
-          <Input name="password" type="password" placeholder="Senha" required />
-          <Input
-            name="password_confirmation"
-            type="password"
-            placeholder="Confirmar senha"
-            required
-          />
+        <form onSubmit={handleSubmit} className="mt-8 space-y-6">
+          <div className="space-y-4">
+            <Input
+              name="name"
+              type="text"
+              placeholder="Seu nome"
+              required
+              autoComplete="name"
+              className="w-full"
+            />
 
-          {error && <p className="text-red-600 text-sm text-center">{error}</p>}
+            <Input
+              name="email"
+              type="email"
+              placeholder="seu@email.com"
+              required
+              autoComplete="email"
+              className="w-full"
+            />
 
-          <Button disabled={loading} type="submit" className="w-full">
-            {loading ? "Criando..." : "Criar conta"}
+            <Input
+              name="password"
+              type="password"
+              placeholder="••••••••"
+              required
+              autoComplete="new-password"
+              className="w-full"
+            />
+
+            <Input
+              name="password_confirmation"
+              type="password"
+              placeholder="Confirme a senha"
+              required
+              autoComplete="new-password"
+              className="w-full"
+            />
+          </div>
+
+          {error && (
+            <div className="rounded-md bg-red-50 p-4">
+              <p className="text-sm text-red-800 text-center">{error}</p>
+            </div>
+          )}
+
+          <Button
+            type="submit"
+            disabled={loading}
+            className="w-full flex justify-center py-2 px-4"
+          >
+            {loading ? "Criando conta..." : "Criar conta"}
           </Button>
         </form>
-
-        <p className="text-center text-sm">
-          Já tem conta? <Link href="/login">Entrar</Link>
-        </p>
       </section>
     </main>
   );
 }
-
