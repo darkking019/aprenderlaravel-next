@@ -3,7 +3,7 @@
 return [
 
     'paths' => [
-        'api/*',
+        'a*',
     ],
 
     'allowed_methods' => ['*'],
