@@ -1,7 +1,4 @@
 <?php
-
-
-
 // app/Http/Middleware/DisableCsrfForApi.php
 namespace App\Http\Middleware;
 
@@ -12,10 +9,8 @@ class DisableCsrfForApi
 {
     public function handle(Request $request, Closure $next)
     {
-        // Ignora CSRF se a rota começar com /api
-        if ($request->is('api/*')) {
-            $request->session()->forget('_token');
-        }
+        // Ignora completamente qualquer verificação de CSRF
+        $request->attributes->set('csrf_token_skipped', true);
 
         return $next($request);
     }
