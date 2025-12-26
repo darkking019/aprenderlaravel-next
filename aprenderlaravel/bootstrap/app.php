@@ -16,13 +16,22 @@ return Application::configure(basePath: dirname(__DIR__))
     )
    ->withMiddleware(function (Middleware $middleware) {
 
-    //  CORS global (sempre primeiro)
-   
+    // API PURA — SEM COOKIE, SEM CSRF
+    $middleware->group('api', [
+        'throttle:api',
+        \Illuminate\Routing\Middleware\SubstituteBindings::class,
+    ]);
 
-   
-  
+    // Web continua web
+    $middleware->group('web', [
+        \Illuminate\Cookie\Middleware\EncryptCookies::class,
+        \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
+        \Illuminate\Session\Middleware\StartSession::class,
+        \Illuminate\View\Middleware\ShareErrorsFromSession::class,
+        \Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class,
+        \Illuminate\Routing\Middleware\SubstituteBindings::class,
+    ]);
 
-    //  Alias padrão
     $middleware->alias([
         'verified' => \App\Http\Middleware\EnsureEmailIsVerified::class,
     ]);
