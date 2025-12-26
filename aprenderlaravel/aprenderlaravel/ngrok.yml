@@ -1,9 +1,0 @@
-version: "3"  # ou "2" se for versão antiga
-authtoken: 37CaHYfVB0brjbr1N9DdVaQDkRC_m7cB5bF8sAJ6eTjtC4P8  # pegue no dashboard: https://dashboard.ngrok.com/get-started/your-authtoken
-tunnels:
-  frontend:
-    proto: http
-    addr: 3000
-  backend:
-    proto: http
-    addr: 8000
